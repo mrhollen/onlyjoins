@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnlyJoins - SQL Joins You'll Crave</title>
+    <style>
+        body {
+            font-family: 'Space Mono', monospace;
+            background-color: #1a1a1a;
+            color: #ff3366;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 50px 0;
+            border-bottom: 3px solid #ff3366;
+        }
+
+        .logo {
+            font-family: 'Impact', sans-serif;
+            font-size: 3.5em;
+            color: #ff3366;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .sql-examples {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .example-card {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(255,51,102,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .sql-description {
+            margin-left: 20px;
+            flex: 1;
+            min-width: 250px;
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 10px;
+            color: #ffffff;
+        }
+
+        .sql-code {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1em;
+            line-height: 1.5;
+            color: #ffffff;
+            margin-bottom: 15px;
+            background-color: #3a3a3a;
+            padding: 15px;
+            border-radius: 10px;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .example-card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+
+        .example-card:nth-child(odd) {
+            grid-column: 2 / 1;
+        }
+
+        .subscription {
+            background-color: #2a2a2a;
+            padding: 40px;
+            border-radius: 10px;
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #ff3366;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .cta-button:hover {
+            background-color: #ff1a4d;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            border-top: 3px solid #ff3366;
+            color: #ffffff;
+        }
+
+        @font-face {
+            font-family: 'Space Mono';
+            src: url('data:font/woff2;base64,d09GMg...') format('woff2');
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">OnlyJoins</div>
+            <h1>SQL Joins You'll Crave</h1>
+        </header>
+
+        <div class="sql-examples">
+            <div class="example-card">
+                <div class="sql-code">
+                    SELECT u.username, o.order_date, p.product_name
+                    FROM users u
+                    INNER JOIN orders o
+                    ON u.id = o.user_id
+                    LEFT JOIN (
+                        SELECT order_id, product_name 
+                        FROM order_items 
+                        WHERE quantity > 10
+                    ) p
+                    ON o.id = p.order_id
+                    WHERE o.total_amount > 1000
+                    ORDER BY o.order_date DESC;
+                </div>
+                <div class="sql-description">
+                    <h3>SPICY INNER + LEFT JOIN</h3>
+                    <p>This join is hotter than a pepperoni pizza in July! It combines users with their high-value orders and only shows products with quantities over 10. Don't try this at home unless you're ready for some heat!</p>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="sql-code">
+                    WITH recent_customers AS (
+                        SELECT id, name 
+                        FROM customers 
+                        WHERE last_order_date > DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+                    )
+                    SELECT rc.name AS customer_name, 
+                           o.order_date,
+                           o.total_amount
+                    FROM recent_customers rc
+                    RIGHT JOIN orders o
+                    ON rc.id = o.customer_id
+                    WHERE o.shipping_status = 'delivered';
+                </div>
+                <div class="sql-description">
+                    <h3>HOT RIGHT JOIN with CTE</h3>
+                    <p>This join is like a warm embrace from your database. It uses a Common Table Expression (CTE) to find recent customers and joins them with delivered orders. Warning: May cause database performance issues if not used responsibly!</p>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="sql-code">
+                    SELECT e.employee_name, d.department_name, 
+                           COUNT(p.project_id) AS project_count
+                    FROM employees e
+                    FULL OUTER JOIN departments d
+                    ON e.department_id = d.id
+                    LEFT JOIN projects p
+                    ON d.id = p.department_id
+                    GROUP BY e.employee_name, d.department_name
+                    HAVING project_count > 5;
+                </div>
+                <div class="sql-description">
+                    <h3>FULL OUTER JOIN with GROUP BY</h3>
+                    <p>This join is a real showstopper! It combines employees and departments, even if they don't have matching records, and counts their projects. Only shows departments with over 5 projects. Warning: This one might blow your mind!</p>
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="sql-code">
+                    SELECT a.actor_name, m.movie_title, r.rating
+                    FROM actors a
+                    CROSS JOIN movies m
+                    LEFT JOIN (
+                        SELECT movie_id, AVG(rating) AS rating
+                        FROM reviews
+                        GROUP BY movie_id
+                    ) r
+                    ON m.id = r.movie_id
+                    WHERE a.age > 30
+                    ORDER BY r.rating DESC;
+                </div>
+                <div class="sql-description">
+                    <h3>CROSS JOIN with AVERAGE RATINGS</h3>
+                    <p>This join is a real crowd-pleaser! It combines actors over 30 with all movies and their average ratings. Warning: This join might make your database cry if not optimized properly!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="subscription">
+            <h2>Get Premium SQL Joins</h2>
+            <p>Subscribe now for access to exclusive SQL joins that will make your database queries hotter than ever!</p>
+            <a href="#" class="cta-button">Join Now - $9.99/month</a>
+
+            <div class="sql-subscription">
+                <div class="sql-code">
+                    CREATE TABLE subscriptions (
+                        id INT PRIMARY KEY AUTO_INCREMENT,
+                        user_id INT NOT NULL,
+                        plan_type ENUM('basic', 'premium'),
+                        expiration_date DATETIME,
+                        subscription_limit INT DEFAULT 3,
+                        INDEX user_id_idx (user_id)
+                    );
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>OnlyJoins - Where SQL meets passion!</p>
+            <p>Warning: This site may contain explicit SQL joins that are not suitable for all audiences.</p>
+        </footer>
+    </div>
+</body>
+</html>
